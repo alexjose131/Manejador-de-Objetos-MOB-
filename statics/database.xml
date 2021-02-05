@@ -1,0 +1,22 @@
+<objetos>
+    <objeto id="obj1">
+        <nombre>Objeto Prueba 1</nombre>
+        <fecha>2021-02-05</fecha>
+        <accion>COMMIT</accion>
+    </objeto>
+    <objeto id="obj2">
+        <nombre>Objeto Prueba 2</nombre>
+        <fecha>2021-02-05</fecha>
+        <accion>COMMIT</accion>
+    </objeto>
+    <objeto id="obj3">
+        <nombre>Objeto Prueba 3</nombre>
+        <fecha>2021-02-05</fecha>
+        <accion>ABORT</accion>
+    </objeto>
+    <objeto id="obj4">
+        <nombre>Objeto Prueba 4</nombre>
+        <fecha>2021-02-05</fecha>
+        <accion>ABORT</accion>
+    </objeto>
+</objetos>

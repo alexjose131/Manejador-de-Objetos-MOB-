@@ -16,7 +16,9 @@ export default {
   consultar: async (req, res, next) => {
     try {
       console.log("req.body: ", req.body);
-      const reg = 0;
+      const reg = {
+        valor1: "ok"
+      };
       // logica para consultar en XML
       res.status(200).json(reg);
     } catch (e) {
