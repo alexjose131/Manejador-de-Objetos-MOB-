@@ -14,7 +14,7 @@ export default {
         fs.writeFile("statics/database.xml", reg, () => {});
       });
 
-      res.status(200).json({"status": "Added succesfully."});
+      res.status(200).json({message: "Added succesfully."});
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -39,21 +39,20 @@ export default {
   },
   eliminar: async (req, res, next) => {
     try {
-      console.log("req.body: ", req.body);
       let reg = 0;
       fs.readFile("statics/database.xml", function (err, data) {
          reg = JSON.parse(parser.toJson(data, { reversible: true }));
          reg.objetos.objeto.forEach((objeto, i) => {
            if (objeto.nombre.$t=== req.body.nombre.$t && objeto.fecha.$t === req.body.fecha.$t && objeto.accion.$t === req.body.accion.$t) {
-            console.log('Entra: ', objeto);
             reg.objetos.objeto.splice(i,1);
             reg = parser.toXml((reg), {reversible: true});
             fs.writeFile("statics/database.xml", reg, () => {});
+            res.status(200).json({message: "Deleted successfully"});
            }
          });
 
       });
-      res.status(200).json(reg);
+
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
