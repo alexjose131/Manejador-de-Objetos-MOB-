@@ -1,11 +1,20 @@
 import models from "../models";
+import fs from "fs";
+import parser from "xml2json";
+
 export default {
   crear: async (req, res, next) => {
     try {
       console.log("req.body: ", req.body);
-      const reg = 0;
-      // logica para insertar en XML
-      res.status(200).json(reg);
+      let reg = [];
+      fs.readFile("statics/database.xml", function (err, data) {
+        reg = JSON.parse(parser.toJson(data, { reversible: true }));
+        reg.objetos.objeto.push(req.body);
+        reg = parser.toXml((reg), {reversible: true});
+        fs.writeFile("statics/database.xml", reg, () => {});
+      });
+
+      res.status(200).json({"status": "Added succesfully."});
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -15,12 +24,12 @@ export default {
   },
   consultar: async (req, res, next) => {
     try {
-      console.log("req.body: ", req.body);
-      const reg = {
-        valor1: "ok"
-      };
-      // logica para consultar en XML
-      res.status(200).json(reg);
+      let reg;
+      fs.readFile("statics/database.xml", function (err, data) {
+        reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos.objeto;
+        res.status(200).json(reg);
+      });
+
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -31,8 +40,19 @@ export default {
   eliminar: async (req, res, next) => {
     try {
       console.log("req.body: ", req.body);
-      const reg = 0;
-      // logica para eliminar en XML
+      let reg = 0;
+      fs.readFile("statics/database.xml", function (err, data) {
+         reg = JSON.parse(parser.toJson(data, { reversible: true }));
+         reg.objetos.objeto.forEach((objeto, i) => {
+           if (objeto.nombre.$t=== req.body.nombre.$t && objeto.fecha.$t === req.body.fecha.$t && objeto.accion.$t === req.body.accion.$t) {
+            console.log('Entra: ', objeto);
+            reg.objetos.objeto.splice(i,1);
+            reg = parser.toXml((reg), {reversible: true});
+            fs.writeFile("statics/database.xml", reg, () => {});
+           }
+         });
+
+      });
       res.status(200).json(reg);
     } catch (e) {
       res.status(500).send({
