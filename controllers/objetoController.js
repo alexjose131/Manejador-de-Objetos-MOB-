@@ -68,8 +68,11 @@ export default {
       const socket = io("http://" + process.env.SERVER_CONTROLLER_IP + ":" + process.env.SERVER_CONTROLLER_PORT);
       
       socket.on("connect", () => {
+        console.log(socket.id)
         socket.emit('new_message', 'this is a test');
-        socket.disconnect();
+        socket.on('respuesta', (data) => {
+          console.log(data);
+        })
       });
 
       res.status(200).json(reg);
