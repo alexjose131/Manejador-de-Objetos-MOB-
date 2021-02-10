@@ -6,7 +6,7 @@ const router = routerx();
 router.post("/crear", ObjetoController.crear);
 router.get("/consultar", ObjetoController.consultar);
 router.delete("/eliminar", ObjetoController.eliminar);
-router.get("/replicar", ObjetoController.replicar);
+router.post("/replicar", ObjetoController.replicar);
 router.get("/restaurar", ObjetoController.restaurar);
 
 export default router;

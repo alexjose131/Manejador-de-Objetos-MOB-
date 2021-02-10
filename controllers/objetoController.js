@@ -10,7 +10,31 @@ export default {
       let reg = [];
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
         reg = JSON.parse(parser.toJson(data, { reversible: true }));
-        reg.objetos.objeto.push(req.body);
+        console.log("reg: ", reg);
+        if (reg.objetos && reg.objetos.objeto[1]) {
+          reg.objetos.objeto.push(req.body);
+        } else {
+          if (reg.objetos && reg.objetos.objeto) {
+            reg = {
+              objetos: {
+                objeto: [
+                  {
+                    nombre: reg.objetos.objeto.nombre,
+                    fecha: reg.objetos.objeto.fecha,
+                    accion: reg.objetos.objeto.accion,
+                  },
+                  req.body,
+                ],
+              },
+            };
+          } else {
+            reg = {
+              objetos: {
+                objeto: [req.body],
+              },
+            };
+          }
+        }
         reg = parser.toXml(reg, { reversible: true });
         fs.writeFile(process.env.DATABASE_URL, reg, () => {});
       });
@@ -73,19 +97,22 @@ export default {
       );
 
       socket.on("connect", () => {
-        console.log(socket.id);
+        console.log("id del socket: ", socket.id);
 
         let reg;
         fs.readFile(process.env.DATABASE_URL, function (err, data) {
           if (data) {
             reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
               .objeto;
-            socket.emit("replicar", reg);
+            socket.emit("replicar", {
+              accion: req.body.accion,
+              objetos: reg,
+            });
           }
         });
 
         socket.on("respuesta", (data) => {
-          console.log(data);
+          console.log("esta es la respuesta", data);
         });
       });
 
