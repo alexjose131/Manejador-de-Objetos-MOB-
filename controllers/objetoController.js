@@ -11,11 +11,11 @@ export default {
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
         reg = JSON.parse(parser.toJson(data, { reversible: true }));
         reg.objetos.objeto.push(req.body);
-        reg = parser.toXml((reg), {reversible: true});
+        reg = parser.toXml(reg, { reversible: true });
         fs.writeFile(process.env.DATABASE_URL, reg, () => {});
       });
 
-      res.status(200).json({message: "Added succesfully."});
+      res.status(200).json({ message: "Added succesfully." });
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -27,10 +27,10 @@ export default {
     try {
       let reg;
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
-        reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos.objeto;
+        reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
+          .objeto;
         res.status(200).json(reg);
       });
-
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -42,18 +42,20 @@ export default {
     try {
       let reg = 0;
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
-         reg = JSON.parse(parser.toJson(data, { reversible: true }));
-         reg.objetos.objeto.forEach((objeto, i) => {
-           if (objeto.nombre.$t=== req.body.nombre.$t && objeto.fecha.$t === req.body.fecha.$t && objeto.accion.$t === req.body.accion.$t) {
-            reg.objetos.objeto.splice(i,1);
-            reg = parser.toXml((reg), {reversible: true});
+        reg = JSON.parse(parser.toJson(data, { reversible: true }));
+        reg.objetos.objeto.forEach((objeto, i) => {
+          if (
+            objeto.nombre.$t === req.body.nombre.$t &&
+            objeto.fecha.$t === req.body.fecha.$t &&
+            objeto.accion.$t === req.body.accion.$t
+          ) {
+            reg.objetos.objeto.splice(i, 1);
+            reg = parser.toXml(reg, { reversible: true });
             fs.writeFile(process.env.DATABASE_URL, reg, () => {});
-            res.status(200).json({message: "Deleted successfully"});
-           }
-         });
-
+            res.status(200).json({ message: "Deleted successfully" });
+          }
+        });
       });
-
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -63,19 +65,33 @@ export default {
   },
   replicar: async (req, res, next) => {
     try {
-      console.log("req.body: ", req.body);
-      const reg = 0;
-      const socket = io("http://" + process.env.SERVER_CONTROLLER_IP + ":" + process.env.SERVER_CONTROLLER_PORT);
-      
+      const socket = io(
+        "http://" +
+          process.env.SERVER_CONTROLLER_IP +
+          ":" +
+          process.env.SERVER_CONTROLLER_PORT
+      );
+
       socket.on("connect", () => {
-        console.log(socket.id)
-        socket.emit('new_message', 'this is a test');
-        socket.on('respuesta', (data) => {
+        console.log(socket.id);
+
+        let reg;
+        fs.readFile(process.env.DATABASE_URL, function (err, data) {
+          if (data) {
+            reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
+              .objeto;
+            socket.emit("replicar", reg);
+          }
+        });
+
+        socket.on("respuesta", (data) => {
           console.log(data);
-        })
+        });
       });
 
-      res.status(200).json(reg);
+      res.status(200).json({
+        message: "Se replicó",
+      });
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
@@ -85,10 +101,24 @@ export default {
   },
   restaurar: async (req, res, next) => {
     try {
-      console.log("req.body: ", req.body);
-      const reg = 0;
-      // logica para restaurar en XML
-      res.status(200).json(reg);
+      const socket = io(
+        "http://" +
+          process.env.SERVER_CONTROLLER_IP +
+          ":" +
+          process.env.SERVER_CONTROLLER_PORT
+      );
+
+      socket.on("connect", () => {
+        socket.emit("restaurar");
+
+        socket.on("respuesta", (data) => {
+          console.log(data);
+        });
+      });
+
+      res.status(200).json({
+        message: "Se restauró",
+      });
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
