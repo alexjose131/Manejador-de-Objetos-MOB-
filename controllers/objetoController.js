@@ -97,22 +97,22 @@ export default {
       );
 
       socket.on("connect", () => {
-        console.log("id del socket: ", socket.id);
-
         let reg;
         fs.readFile(process.env.DATABASE_URL, function (err, data) {
           if (data) {
             reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
               .objeto;
-            socket.emit("replicar", {
-              accion: req.body.accion,
-              objetos: reg,
-            });
+            socket.emit(
+              "replicar",
+              {
+                accion: req.body.accion,
+                objetos: reg,
+              },
+              function (res) {
+                console.log("Resultado de la réplica: ", res);
+              }
+            );
           }
-        });
-
-        socket.on("respuesta", (data) => {
-          console.log("esta es la respuesta", data);
         });
       });
 
