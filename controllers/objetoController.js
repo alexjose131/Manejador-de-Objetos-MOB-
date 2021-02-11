@@ -103,7 +103,7 @@ export default {
             reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
               .objeto;
             socket.emit(
-              "replicar",
+              "replicarObjetos",
               {
                 accion: req.body.accion,
                 objetos: reg,
