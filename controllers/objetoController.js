@@ -136,15 +136,14 @@ export default {
       );
 
       socket.on("connect", () => {
-        socket.emit("restaurar");
+        socket.emit("restaurarObjetos", function (respuestaCoor) {
+          console.log("Resultado de la restauración: ", respuestaCoor);
 
-        socket.on("respuesta", (data) => {
-          console.log(data);
+          res.status(200).json({
+            message: "Se restauró",
+            data: respuestaCoor,
+          });
         });
-      });
-
-      res.status(200).json({
-        message: "Se restauró",
       });
     } catch (e) {
       res.status(500).send({
