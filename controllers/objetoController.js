@@ -128,7 +128,12 @@ export default {
                   res.status(200).json({
                     message: "No se replicó debido a que uno de los servidores está caído.",
                   });
-                } else {
+                } if (response === false) {
+                  res.status(200).json({
+                    message: "No se replicó debido a que uno de los servidores negó la petición.",
+                  });
+                }
+                else {
                   res.status(200).json({
                     message: "Se replicó correctamente.",
                   });
