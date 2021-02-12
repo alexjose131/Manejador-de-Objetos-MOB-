@@ -126,11 +126,11 @@ export default {
                 console.log("Resultado de la réplica: ", response);
                 if (response === "El servidor 1 no responde" || response === "El servidor 2 no responde") {
                   res.status(200).json({
-                    message: "No se replicó",
+                    message: "No se replicó debido a que uno de los servidores está caído.",
                   });
                 } else {
                   res.status(200).json({
-                    message: "Se replicó",
+                    message: "Se replicó correctamente.",
                   });
                 }
                 
@@ -160,19 +160,24 @@ export default {
       socket.on("connect", () => {
         socket.emit("restaurarObjetos", function (respuestaCoor) {
           console.log("Resultado de la restauración: ", respuestaCoor);
-          console.log(respuestaCoor)
-          if (!Array.isArray(respuestaCoor.data)) {
+          if (!Array.isArray(respuestaCoor.data) && typeof respuestaCoor.data !== "undefined") {
             respuestaCoor = [respuestaCoor.data]
             fs.writeFile(process.env.DATABASE_URL, parser.toXml({objetos: {objeto: respuestaCoor}}, { reversible: true }), () => {});
-          } else {
+          } else if (typeof respuestaCoor.data !== "undefined"){
             fs.writeFile(process.env.DATABASE_URL, parser.toXml({objetos: {objeto: respuestaCoor.data}}, { reversible: true }), () => {});
           }
-          console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', respuestaCoor)
-          
-          res.status(200).json({
-            message: "Se restauró",
-            data: respuestaCoor,
-          });
+          if (typeof respuestaCoor.data !== "undefined") {
+            res.status(200).json({
+              message: "Se restauró",
+              data: respuestaCoor,
+            });
+          } else {
+            res.status(200).json({
+              message: "No se restauró",
+              data: null,
+            });
+          }
+
         });
       });
     } catch (e) {
