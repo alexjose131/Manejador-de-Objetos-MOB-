@@ -51,11 +51,13 @@ export default {
       let reg;
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
         reg = JSON.parse(parser.toJson(data, { reversible: true }));
-        if (reg){
-          res.status(200).json(reg).objetos
-          .objeto;
-        } else {
+        if (Object.entries(reg).length === 0){
           res.status(200).send([]);
+        } else if (!Array.isArray(reg.objetos.objeto)){
+          res.status(200).send([reg.objetos.objeto]);
+        } else {
+          res.status(200).json(reg.objetos
+            .objeto);
         }
 
       });
@@ -68,21 +70,29 @@ export default {
   },
   eliminar: async (req, res, next) => {
     try {
-      let reg = 0;
+      let reg = [];
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
         reg = JSON.parse(parser.toJson(data, { reversible: true }));
-        reg.objetos.objeto.forEach((objeto, i) => {
-          if (
-            objeto.nombre.$t === req.body.nombre.$t &&
-            objeto.fecha.$t === req.body.fecha.$t &&
-            objeto.accion.$t === req.body.accion.$t
-          ) {
-            reg.objetos.objeto.splice(i, 1);
-            reg = parser.toXml(reg, { reversible: true });
-            fs.writeFile(process.env.DATABASE_URL, reg, () => {});
-            res.status(200).json({ message: "Deleted successfully" });
-          }
-        });
+        console.log(reg)
+        if (!Array.isArray(reg.objetos.objeto)) {
+          reg = {}
+          reg = parser.toXml(reg, { reversible: true });
+          fs.writeFile(process.env.DATABASE_URL, reg, () => {});
+          res.status(200).json({ message: "Deleted successfully" });
+        } else {
+          reg.objetos.objeto.forEach((objeto, i) => {
+            if (
+              objeto.nombre.$t === req.body.nombre.$t &&
+              objeto.fecha.$t === req.body.fecha.$t &&
+              objeto.accion.$t === req.body.accion.$t
+            ) {
+              reg.objetos.objeto.splice(i, 1);
+              reg = parser.toXml(reg, { reversible: true });
+              fs.writeFile(process.env.DATABASE_URL, reg, () => {});
+              res.status(200).json({ message: "Deleted successfully" });
+            }
+          });
+        }
       });
     } catch (e) {
       res.status(500).send({
@@ -142,7 +152,15 @@ export default {
       socket.on("connect", () => {
         socket.emit("restaurarObjetos", function (respuestaCoor) {
           console.log("Resultado de la restauración: ", respuestaCoor);
-
+          console.log(respuestaCoor)
+          if (!Array.isArray(respuestaCoor.data)) {
+            respuestaCoor = [respuestaCoor.data]
+            fs.writeFile(process.env.DATABASE_URL, parser.toXml({objetos: {objeto: respuestaCoor}}, { reversible: true }), () => {});
+          } else {
+            fs.writeFile(process.env.DATABASE_URL, parser.toXml({objetos: {objeto: respuestaCoor.data}}, { reversible: true }), () => {});
+          }
+          console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', respuestaCoor)
+          
           res.status(200).json({
             message: "Se restauró",
             data: respuestaCoor,
