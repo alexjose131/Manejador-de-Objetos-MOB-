@@ -50,11 +50,14 @@ export default {
     try {
       let reg;
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
-        if(data) {
-          reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
+        reg = JSON.parse(parser.toJson(data, { reversible: true }));
+        if (reg){
+          res.status(200).json(reg).objetos
           .objeto;
-          res.status(200).json(reg);
+        } else {
+          res.status(200).send([]);
         }
+
       });
     } catch (e) {
       res.status(500).send({
