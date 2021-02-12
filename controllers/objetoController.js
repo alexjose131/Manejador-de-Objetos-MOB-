@@ -122,17 +122,25 @@ export default {
                 accion: req.body.accion,
                 objetos: reg,
               },
-              function (res) {
-                console.log("Resultado de la réplica: ", res);
+              function (response) {
+                console.log("Resultado de la réplica: ", response);
+                if (response === "El servidor 1 no responde" || response === "El servidor 2 no responde") {
+                  res.status(200).json({
+                    message: "No se replicó",
+                  });
+                } else {
+                  res.status(200).json({
+                    message: "Se replicó",
+                  });
+                }
+                
               }
             );
           }
         });
       });
 
-      res.status(200).json({
-        message: "Se replicó",
-      });
+
     } catch (e) {
       res.status(500).send({
         message: "Ocurrió un error",
