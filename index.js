@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", router);
 app.set("port", process.env.PORT || 3000);
 
-
+// se coloca el servidor en escucha
 app.listen(app.get("port"), () => {
   console.log(`Server running in port ${app.get("port")}`);
   console.log(path.join(__dirname, "public"));
