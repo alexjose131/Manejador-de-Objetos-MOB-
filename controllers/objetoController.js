@@ -6,7 +6,6 @@ import { io } from "socket.io-client";
 export default {
   crear: async (req, res, next) => {
     try {
-      console.log("req.body: ", req.body);
       let reg = [];
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
         reg = JSON.parse(parser.toJson(data, { reversible: true }));
@@ -51,9 +50,11 @@ export default {
     try {
       let reg;
       fs.readFile(process.env.DATABASE_URL, function (err, data) {
-        reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
+        if(data) {
+          reg = JSON.parse(parser.toJson(data, { reversible: true })).objetos
           .objeto;
-        res.status(200).json(reg);
+          res.status(200).json(reg);
+        }
       });
     } catch (e) {
       res.status(500).send({
